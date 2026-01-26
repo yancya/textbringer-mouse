@@ -9,9 +9,6 @@ module Curses
   BUTTON5_PRESSED = 0x8000000 unless defined?(BUTTON5_PRESSED)
 end
 
-# プラグインロード時にマウスを有効化
-Curses.mousemask(Curses::ALL_MOUSE_EVENTS | Curses::REPORT_MOUSE_POSITION)
-
 module Textbringer
   module Mouse
     # Mouse機能を初期化
@@ -24,6 +21,10 @@ module Textbringer
 
       if key == Curses::KEY_MOUSE
         handle_mouse_event
+
+        # マウスイベント処理後に画面を再描画
+        Window.redisplay
+
         return nil  # マウスイベントは通常のキーとして処理しない
       end
 
@@ -212,4 +213,18 @@ module Textbringer
   end
 
   Window.prepend(WindowMouseExtension)
+
+  # Window.startをフックして、Curses初期化後にマウスを有効化
+  class << Window
+    alias_method :original_start, :start
+
+    def start(&block)
+      original_start do
+        # Curses.init_screen後にマウスを有効化
+        Curses.mousemask(Curses::ALL_MOUSE_EVENTS | Curses::REPORT_MOUSE_POSITION)
+
+        block.call
+      end
+    end
+  end
 end
