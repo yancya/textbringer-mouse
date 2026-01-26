@@ -26,7 +26,13 @@ module Textbringer
 
     # マウスイベントハンドラ
     def handle_mouse_event
+      # Ruby 4.0のcursesライブラリの警告を抑制
+      # "warning: undefining the allocator of T_DATA class Curses::MouseEvent"
+      old_verbose = $VERBOSE
+      $VERBOSE = nil
       event = Curses.getmouse
+      $VERBOSE = old_verbose
+
       x = event.x
       y = event.y
       bstate = event.bstate
