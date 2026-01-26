@@ -1,0 +1,123 @@
+PATH
+  remote: .
+  specs:
+    textbringer-mouse (0.1.0)
+      textbringer (>= 1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    clipboard (2.0.0)
+    curses (1.5.3)
+    date (3.5.1)
+    drb (2.2.3)
+    editorconfig (0.2.2)
+    erb (6.0.1)
+    fiddle (1.1.8)
+    fiddley (0.0.8)
+    io-console (0.8.2)
+    irb (1.16.0)
+      pp (>= 0.6.0)
+      rdoc (>= 4.0.0)
+      reline (>= 0.4.2)
+    minitest (6.0.1)
+      prism (~> 1.5)
+    nkf (0.2.0)
+    ostruct (0.6.3)
+    power_assert (3.0.1)
+    pp (0.6.3)
+      prettyprint
+    prettyprint (0.2.0)
+    prism (1.8.0)
+    psych (5.3.1)
+      date
+      stringio
+    rake (13.3.1)
+    rdoc (7.1.0)
+      erb
+      psych (>= 4.0.0)
+      tsort
+    reline (0.6.3)
+      io-console (~> 0.5)
+    stringio (3.2.0)
+    test-unit (3.7.7)
+      power_assert
+    textbringer (18)
+      clipboard (>= 1.1)
+      curses (>= 1.2.7)
+      drb
+      editorconfig
+      fiddle
+      fiddley (>= 0.0.5)
+      irb
+      nkf
+      ostruct
+      rdoc
+      unicode-blocks
+      unicode-categories
+      unicode-display_width (>= 1.1)
+      unicode-name
+      unicode-scripts
+      unicode-types
+      warning
+    tsort (0.2.0)
+    unicode-blocks (1.11.0)
+    unicode-categories (1.11.0)
+    unicode-display_width (3.2.0)
+      unicode-emoji (~> 4.1)
+    unicode-emoji (4.2.0)
+    unicode-name (1.14.0)
+      unicode-types (~> 1.11)
+    unicode-scripts (1.12.0)
+    unicode-types (1.11.0)
+    warning (1.5.0)
+
+PLATFORMS
+  arm64-darwin-25
+  ruby
+
+DEPENDENCIES
+  irb
+  minitest
+  rake (~> 13.0)
+  test-unit
+  textbringer-mouse!
+
+CHECKSUMS
+  clipboard (2.0.0) sha256=88d048fd2097506451c382d3ecf3acd9cdf24f581d8119437e55c1efc04e01c8
+  curses (1.5.3) sha256=86d219442e7fe78e68c609e6884f08b439b7508cf3f9d5b914f75c106e77bf7c
+  date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
+  drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
+  editorconfig (0.2.2) sha256=78ef2374d0efe22212642c0fb8e69db3801a433951a756871644b15eef7fad57
+  erb (6.0.1) sha256=28ecdd99c5472aebd5674d6061e3c6b0a45c049578b071e5a52c2a7f13c197e5
+  fiddle (1.1.8) sha256=7fa8ee3627271497f3add5503acdbc3f40b32f610fc1cf49634f083ef3f32eee
+  fiddley (0.0.8) sha256=b59a90da26944ae8d98bd091596927dadac5666f957e1a1e22d7bedeae31a654
+  io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
+  irb (1.16.0) sha256=2abe56c9ac947cdcb2f150572904ba798c1e93c890c256f8429981a7675b0806
+  minitest (6.0.1) sha256=7854c74f48e2e975969062833adc4013f249a4b212f5e7b9d5c040bf838d54bb
+  nkf (0.2.0) sha256=fbc151bda025451f627fafdfcb3f4f13d0b22ae11f58c6d3a2939c76c5f5f126
+  ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
+  power_assert (3.0.1) sha256=8ce9876716cc74e863fcd4cdcdc52d792bd983598d1af3447083a3a9a4d34103
+  pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
+  prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
+  prism (1.8.0) sha256=84453a16ef5530ea62c5f03ec16b52a459575ad4e7b9c2b360fd8ce2c39c1254
+  psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
+  rake (13.3.1) sha256=8c9e89d09f66a26a01264e7e3480ec0607f0c497a861ef16063604b1b08eb19c
+  rdoc (7.1.0) sha256=494899df0706c178596ca6e1d50f1b7eb285a9b2aae715be5abd742734f17363
+  reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
+  stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
+  test-unit (3.7.7) sha256=3c89d5ff0690a16bef9946156c4624390402b9d54dfcf4ce9cbd5b06bead1e45
+  textbringer (18) sha256=4f2748a9fbb52db4976819a144b7bbd42e67edbda61b46449d542c2bc2b8fe15
+  textbringer-mouse (0.1.0)
+  tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
+  unicode-blocks (1.11.0) sha256=80b8b11076aa9eaad4b070c37476403e5332252fb24321ffb6ff441ddf87dbb1
+  unicode-categories (1.11.0) sha256=ff33b443162d934d6d97cee0a07c08f02bd668cd7d6b7c0935c2fbfed7619f8c
+  unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
+  unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
+  unicode-name (1.14.0) sha256=b350dcdeb503748c8ad05c472e8078570fbf3231a73be53431c15db10bbedbdd
+  unicode-scripts (1.12.0) sha256=67a4cf3e68dc1d20826ae744b155271822ff6b0baea4a52b94db0a9823322fb9
+  unicode-types (1.11.0) sha256=81d1201273260fa89b85471e7eebb93a51bb4e5f078a525508dcae7835d176f9
+  warning (1.5.0) sha256=0f12c49fea0c06757778eefdcc7771e4fd99308901e3d55c504d87afdd718c53
+
+BUNDLED WITH
+  4.0.4
