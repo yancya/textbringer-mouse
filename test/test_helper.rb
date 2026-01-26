@@ -2,10 +2,10 @@
 
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "textbringer"
-require "textbringer/mouse"
 
 # Cursesモック機能の実装
 # textbringerのテストインフラを参考にしつつ、マウスイベント機能を拡張
+# NOTE: textbringer/mouse を require する前に Curses のモックメソッドを定義する必要がある
 
 module Curses
   # マウス定数（未定義の場合に定義）
@@ -47,6 +47,9 @@ module Curses
     end
   end
 end
+
+# Curses モックの準備ができたので、プラグインをロード
+require "textbringer/mouse"
 
 # ミニマルなテストケースベースクラス
 require "test/unit"
