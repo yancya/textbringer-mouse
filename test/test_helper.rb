@@ -35,6 +35,19 @@ module Curses
   @mouse_event_queue = []
   @mouse_mask = 0
 
+  # モック用のマウスイベントクラス
+  class MockMouseEvent
+    attr_reader :id, :x, :y, :z, :bstate
+
+    def initialize(id, x, y, z, bstate)
+      @id = id
+      @x = x
+      @y = y
+      @z = z
+      @bstate = bstate
+    end
+  end
+
   class << self
     attr_accessor :mouse_event_queue, :mouse_mask
 
@@ -54,7 +67,7 @@ module Curses
 
     # テスト用：マウスイベントをキューに追加
     def push_mouse_event(bstate:, x:, y:, id: 0, z: 0)
-      @mouse_event_queue << [id, x, y, z, bstate]
+      @mouse_event_queue << MockMouseEvent.new(id, x, y, z, bstate)
     end
   end
 end

@@ -26,7 +26,10 @@ module Textbringer
 
     # マウスイベントハンドラ
     def handle_mouse_event
-      _id, x, y, _z, bstate = Curses.getmouse
+      event = Curses.getmouse
+      x = event.x
+      y = event.y
+      bstate = event.bstate
 
       # スクロール処理
       if bstate & Curses::BUTTON4_PRESSED != 0
