@@ -37,7 +37,25 @@ module Textbringer
         return
       end
 
-      # クリック処理 (CLICKED, PRESSED, RELEASEDのいずれかで反応)
+      # ダブルクリック処理
+      if bstate & Curses::BUTTON1_DOUBLE_CLICKED != 0
+        handle_double_click(y, x)
+        return
+      end
+
+      # トリプルクリック処理
+      if bstate & Curses::BUTTON1_TRIPLE_CLICKED != 0
+        handle_triple_click(y, x)
+        return
+      end
+
+      # 右クリック処理
+      if bstate & Curses::BUTTON3_CLICKED != 0
+        handle_right_click(y, x)
+        return
+      end
+
+      # 左クリック処理 (CLICKED, PRESSED, RELEASEDのいずれかで反応)
       if (bstate & Curses::BUTTON1_CLICKED != 0) ||
          (bstate & Curses::BUTTON1_PRESSED != 0) ||
          (bstate & Curses::BUTTON1_RELEASED != 0)
@@ -80,6 +98,61 @@ module Textbringer
       # バッファ位置を計算してカーソルを移動
       pos = window.screen_to_buffer_pos(screen_y, screen_x)
       Buffer.current.goto_char(pos) if pos
+    end
+
+    # ダブルクリック処理 - 単語選択
+    def handle_double_click(screen_y, screen_x)
+      window = find_window_at(screen_y, screen_x)
+      return unless window
+
+      pos = window.screen_to_buffer_pos(screen_y, screen_x)
+      return unless pos
+
+      buffer = Buffer.current
+      buffer.goto_char(pos)
+
+      # 単語の範囲を選択
+      buffer.backward_word
+      Commands.push_mark
+      buffer.forward_word
+    end
+
+    # トリプルクリック処理 - 行選択
+    def handle_triple_click(screen_y, screen_x)
+      window = find_window_at(screen_y, screen_x)
+      return unless window
+
+      pos = window.screen_to_buffer_pos(screen_y, screen_x)
+      return unless pos
+
+      buffer = Buffer.current
+      buffer.goto_char(pos)
+
+      # 行の範囲を選択
+      buffer.beginning_of_line
+      Commands.push_mark
+      buffer.end_of_line
+    end
+
+    # 右クリック処理 - 単語選択（ダブルクリックと同じ動作）
+    def handle_right_click(screen_y, screen_x)
+      handle_double_click(screen_y, screen_x)
+    end
+
+    # ウィンドウ検索ヘルパー
+    def find_window_at(screen_y, screen_x)
+      window = Window.list(include_echo_area: true).find do |w|
+        w.y <= screen_y && screen_y < w.y + w.lines &&
+          w.x <= screen_x && screen_x < w.x + w.columns
+      end
+
+      return nil unless window
+      return nil if window.echo_area?
+
+      # ウィンドウをアクティブにする
+      Window.current = window unless window.current?
+
+      window
     end
 
     # 座標変換 - スクリーン座標からバッファ位置へ
