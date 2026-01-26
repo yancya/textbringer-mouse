@@ -3,6 +3,12 @@
 require "textbringer"
 require_relative "mouse/version"
 
+# BUTTON5_PRESSED が定義されていない環境用の定義
+# 通常はスクロールダウン用だが、環境によっては未定義
+module Curses
+  BUTTON5_PRESSED = 0x8000000 unless defined?(BUTTON5_PRESSED)
+end
+
 # プラグインロード時にマウスを有効化
 Curses.mousemask(Curses::ALL_MOUSE_EVENTS | Curses::REPORT_MOUSE_POSITION)
 
