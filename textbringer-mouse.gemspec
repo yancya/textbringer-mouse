@@ -10,13 +10,13 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Mouse mode for Textbringer"
   spec.description = "A Textbringer plugin that provides mouse mode support with syntax highlighting."
-  spec.homepage = "https://github.com/ShintaKoyanagi/textbringer-mouse"
+  spec.homepage = "https://github.com/yancya/textbringer-mouse"
   spec.license = "WTFPL"
   spec.required_ruby_version = ">= 3.2.0"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/ShintaKoyanagi/textbringer-mouse"
+  spec.metadata["source_code_uri"] = "https://github.com/yancya/textbringer-mouse"
 
   gemspec = File.basename(__FILE__)
   spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
