@@ -85,23 +85,23 @@ class MouseTestCase < Test::Unit::TestCase
     # 各テスト前にマウスイベントキューをクリア
     Curses.mouse_event_queue.clear
 
-    # Bufferの初期化
-    Buffer.instance_variable_set(:@list, [])
-    Buffer.instance_variable_set(:@current, nil)
+    # NOTE: Buffer.list / Window.list はどちらも class variable (@@list, @@current)
+    # を参照するため、instance variable の @list/@current をリセットしても
+    # 効果がなく、テスト間でウィンドウ/バッファが蓄積してしまう
+    Buffer.class_variable_set(:@@list, [])
+    Buffer.class_variable_set(:@@current, nil)
 
-    # Windowの初期化
-    Window.instance_variable_set(:@list, [])
-    Window.instance_variable_set(:@current, nil)
+    Window.class_variable_set(:@@list, [])
+    Window.class_variable_set(:@@current, nil)
   end
 
   def teardown
     Curses.mouse_event_queue.clear
 
-    # 後片付け
-    Buffer.instance_variable_set(:@list, [])
-    Buffer.instance_variable_set(:@current, nil)
-    Window.instance_variable_set(:@list, [])
-    Window.instance_variable_set(:@current, nil)
+    Buffer.class_variable_set(:@@list, [])
+    Buffer.class_variable_set(:@@current, nil)
+    Window.class_variable_set(:@@list, [])
+    Window.class_variable_set(:@@current, nil)
   end
 
   # テスト用の簡易Window/Buffer生成ヘルパー
@@ -117,9 +117,9 @@ class MouseTestCase < Test::Unit::TestCase
     # top_of_windowを設定
     window.instance_variable_set(:@top_of_window, buffer.new_mark)
 
-    Window.instance_variable_get(:@list) << window
-    Window.instance_variable_set(:@current, window)
-    Buffer.instance_variable_set(:@current, buffer)
+    Window.class_variable_get(:@@list) << window
+    Window.class_variable_set(:@@current, window)
+    Buffer.class_variable_set(:@@current, buffer)
 
     window
   end

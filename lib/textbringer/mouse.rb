@@ -136,31 +136,30 @@ module Textbringer
     end
 
     # マウスクリック処理
+    #
+    # クリック位置がモードライン行の場合、screen_to_buffer_pos が nil を
+    # 返すためカーソル移動はスキップされるが、ウィンドウのフォーカス切り替え
+    # 自体は行う（「モードラインをクリックしてそのウィンドウを選択する」という
+    # 期待される挙動のため）。
     def handle_mouse_click(screen_y, screen_x)
-      # クリックされたウィンドウを検索
-      window = Window.list(include_echo_area: true).find do |w|
-        w.y <= screen_y && screen_y < w.y + w.lines &&
-          w.x <= screen_x && screen_x < w.x + w.columns
-      end
-
+      window = window_at(screen_y, screen_x)
       return unless window
-      return if window.echo_area?  # エコーエリアは無視
 
-      # ウィンドウをアクティブにする
       Window.current = window unless window.current?
 
-      # バッファ位置を計算してカーソルを移動
       pos = window.screen_to_buffer_pos(screen_y, screen_x)
       Buffer.current.goto_char(pos) if pos
     end
 
     # ダブルクリック処理 - 単語選択
     def handle_double_click(screen_y, screen_x)
-      window = find_window_at(screen_y, screen_x)
+      window = window_at(screen_y, screen_x)
       return unless window
 
+      Window.current = window unless window.current?
+
       pos = window.screen_to_buffer_pos(screen_y, screen_x)
-      return unless pos
+      return unless pos  # モードライン上ではpos=nilになり、選択は行わない
 
       buffer = Buffer.current
       buffer.goto_char(pos)
@@ -173,11 +172,13 @@ module Textbringer
 
     # トリプルクリック処理 - 行選択
     def handle_triple_click(screen_y, screen_x)
-      window = find_window_at(screen_y, screen_x)
+      window = window_at(screen_y, screen_x)
       return unless window
 
+      Window.current = window unless window.current?
+
       pos = window.screen_to_buffer_pos(screen_y, screen_x)
-      return unless pos
+      return unless pos  # モードライン上ではpos=nilになり、選択は行わない
 
       buffer = Buffer.current
       buffer.goto_char(pos)
@@ -193,8 +194,9 @@ module Textbringer
       handle_double_click(screen_y, screen_x)
     end
 
-    # ウィンドウ検索ヘルパー
-    def find_window_at(screen_y, screen_x)
+    # 指定した画面座標にあるウィンドウを返す（エコーエリアは対象外）。
+    # フォーカス切り替えなどの副作用は持たない — 呼び出し側が必要に応じて行う。
+    def window_at(screen_y, screen_x)
       window = Window.list(include_echo_area: true).find do |w|
         w.y <= screen_y && screen_y < w.y + w.lines &&
           w.x <= screen_x && screen_x < w.x + w.columns
@@ -202,9 +204,6 @@ module Textbringer
 
       return nil unless window
       return nil if window.echo_area?
-
-      # ウィンドウをアクティブにする
-      Window.current = window unless window.current?
 
       window
     end
