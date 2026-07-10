@@ -76,6 +76,12 @@ module Textbringer
         return
       end
 
+      # 中クリック処理 - クリック位置にカーソルを移動してヤンク
+      if bstate & Curses::BUTTON2_CLICKED != 0
+        handle_middle_click(y, x)
+        return
+      end
+
       # 左クリック処理 (CLICKED, PRESSED, RELEASEDのいずれかで反応)
       if (bstate & Curses::BUTTON1_CLICKED != 0) ||
          (bstate & Curses::BUTTON1_PRESSED != 0) ||
@@ -192,6 +198,29 @@ module Textbringer
     # 右クリック処理 - 単語選択（ダブルクリックと同じ動作）
     def handle_right_click(screen_y, screen_x)
       handle_double_click(screen_y, screen_x)
+    end
+
+    # 中クリック処理 - クリック位置にカーソルを移動してキルリングからヤンク
+    #
+    # X11のプライマリセレクションではなく、Textbringer自身のキルリングから
+    # 貼り付ける（ターミナルアプリなのでプライマリセレクションへはアクセスできない）。
+    def handle_middle_click(screen_y, screen_x)
+      window = window_at(screen_y, screen_x)
+      return unless window
+
+      Window.current = window unless window.current?
+
+      pos = window.screen_to_buffer_pos(screen_y, screen_x)
+      return unless pos  # モードライン上ではpos=nilになり、ヤンクは行わない
+
+      buffer = Buffer.current
+      buffer.goto_char(pos)
+
+      begin
+        Commands.yank
+      rescue EditorError
+        # キルリングが空 - pointの移動だけ行い、ヤンクはしない
+      end
     end
 
     # 指定した画面座標にあるウィンドウを返す（エコーエリアは対象外）。
