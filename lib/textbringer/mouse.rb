@@ -172,6 +172,11 @@ module Textbringer
     end
 
     # 座標変換 - スクリーン座標からバッファ位置へ
+    #
+    # redisplay (shugo/textbringer lib/textbringer/window.rb) は
+    # ウィンドウ幅を超える行を画面上で折り返して表示するため、
+    # 「画面1行 = バッファ1行」ではない。折り返しを再現しながら
+    # 対象の画面行の先頭まで進めたうえで、列方向に走査する。
     def screen_to_buffer_pos(screen_y, screen_x)
       # ウィンドウ相対座標
       rel_y = screen_y - @y
@@ -184,25 +189,39 @@ module Textbringer
         # top_of_windowから開始
         @buffer.point_to_mark(@top_of_window)
 
-        # Y行分進む
-        rel_y.times do
-          break if @buffer.end_of_buffer?
-          @buffer.end_of_line
-          @buffer.forward_char  # 改行を越える
-        end
-
-        # X列分進む（表示幅を考慮）
-        @buffer.beginning_of_line
-        display_col = 0
-        while display_col < rel_x && !@buffer.end_of_line?
+        # 対象の画面行の先頭まで、折り返しを考慮して進める
+        cury = 0
+        curx = 0
+        until @buffer.end_of_buffer? || cury == rel_y
           c = @buffer.char_after
-          if c == "\t"
-            width = calc_tab_width(display_col)
-          else
-            width = Buffer.display_width(c)
+          if c == "\n"
+            cury += 1
+            curx = 0
+            @buffer.forward_char
+            next
           end
 
+          width = c == "\t" ? calc_tab_width(curx) : Buffer.display_width(c)
+          if curx + width > @columns
+            # 折り返り: この文字は次の画面行の先頭に描画される
+            cury += 1
+            curx = 0
+            next
+          end
+
+          curx += width
+          @buffer.forward_char
+        end
+
+        # 対象の画面行内をX列分進む（表示幅・折り返りを考慮）
+        display_col = 0
+        while display_col < rel_x && !@buffer.end_of_line? && !@buffer.end_of_buffer?
+          c = @buffer.char_after
+          width = c == "\t" ? calc_tab_width(display_col) : Buffer.display_width(c)
+
+          break if display_col + width > @columns   # この画面行の折り返り境界
           break if display_col + width > rel_x
+
           display_col += width
           @buffer.forward_char
         end
