@@ -1,7 +1,6 @@
 # textbringer-mouse
 
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](.)
-[![Coverage](https://img.shields.io/badge/coverage-80.6%25-green)](.)
+[![CI](https://github.com/yancya/textbringer-mouse/actions/workflows/ci.yml/badge.svg)](https://github.com/yancya/textbringer-mouse/actions/workflows/ci.yml)
 
 A plugin that adds comprehensive mouse support to [Textbringer](https://github.com/shugo/textbringer), the Emacs-like text editor written in Ruby.
 
@@ -213,7 +212,7 @@ Supported events:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+This project is licensed under the WTFPL - see the [LICENSE.txt](LICENSE.txt) file for details.
 
 ## Acknowledgments
 
