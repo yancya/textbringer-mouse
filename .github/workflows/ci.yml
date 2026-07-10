@@ -24,3 +24,8 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake test
+        env:
+          # test_helper.rb がテストごとに実 Curses::Window を生成するため、
+          # terminfo を引けないと "Error opening terminal: unknown" で落ちる。
+          # ランナーにはデフォルトで $TERM が設定されていない。
+          TERM: xterm-256color
