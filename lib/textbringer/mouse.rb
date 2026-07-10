@@ -10,6 +10,11 @@ module Curses
 end
 
 module Textbringer
+  # ホイール1ノッチあたりのスクロール行数。0/nil でページ単位スクロールにフォールバック
+  CONFIG[:mouse_wheel_scroll_lines] ||= 3
+end
+
+module Textbringer
   module Mouse
     # Mouse機能を初期化
   end
@@ -79,21 +84,54 @@ module Textbringer
       end
     end
 
-    # マウススクロール処理 - 上にスクロール
+    # マウススクロール処理 - 上にスクロール（内容を下に = top_of_windowを後方へ）
     def handle_mouse_scroll_up
-      begin
-        Commands.scroll_down  # 画面を上にスクロール = 内容を下に
-      rescue RangeError
-        # バッファの先頭に到達
+      lines = CONFIG[:mouse_wheel_scroll_lines]
+      if lines && lines > 0
+        scroll_window_by_lines(-lines)
+      else
+        begin
+          Commands.scroll_down
+        rescue RangeError
+          # バッファの先頭に到達
+        end
       end
     end
 
-    # マウススクロール処理 - 下にスクロール
+    # マウススクロール処理 - 下にスクロール（内容を上に = top_of_windowを前方へ）
     def handle_mouse_scroll_down
-      begin
-        Commands.scroll_up  # 画面を下にスクロール = 内容を上に
-      rescue RangeError
-        # バッファの末尾に到達
+      lines = CONFIG[:mouse_wheel_scroll_lines]
+      if lines && lines > 0
+        scroll_window_by_lines(lines)
+      else
+        begin
+          Commands.scroll_up
+        rescue RangeError
+          # バッファの末尾に到達
+        end
+      end
+    end
+
+    # top_of_window を n行分（負値で後方へ）動かす。
+    # Buffer#forward_line はバッファ端で例外を出さず可能な範囲まで進むので、
+    # 境界での安全なノーオペレーションが自然に得られる。
+    def scroll_window_by_lines(n)
+      return if @buffer.nil?
+
+      @buffer.save_point do
+        @buffer.point_to_mark(@top_of_window)
+        @buffer.forward_line(n)
+        @buffer.mark_to_point(@top_of_window)
+      end
+
+      # 下スクロールでpointが画面外(上)に隠れた場合、Emacs風にpointを
+      # 新しいtop_of_windowへ追従させる。上スクロールでpointが下端の外に
+      # 出るケースは、ここでは扱わない — Window#redisplay は呼び出しの都度
+      # Window#framer (shugo/textbringer lib/textbringer/window.rb) を実行し、
+      # pointが可視範囲外ならtop_of_windowを自動的に前進/後退させて再度
+      # pointを可視化するため、次の再描画で自然に解消される（v1の既知の制約）。
+      if @buffer.point_before_mark?(@top_of_window)
+        @buffer.point_to_mark(@top_of_window)
       end
     end
 

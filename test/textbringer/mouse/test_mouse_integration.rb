@@ -27,55 +27,86 @@ class TestMouseIntegration < MouseTestCase
     pend "Requires full Window/Buffer initialization"
   end
 
-  def test_handle_mouse_scroll_up
-    # スクロール上（内容を下に）イベント
-    Curses.push_mouse_event(
-      bstate: Curses::BUTTON4_PRESSED,
-      x: 0,
-      y: 0
-    )
+  def test_handle_mouse_scroll_up_moves_top_of_window_up_by_default_lines
+    # 7行のバッファで、top_of_windowを3行目の先頭にしておく
+    @buffer.insert("\nLine A\nLine B\nLine C\nLine D\nLine E\nLine F")
+    @buffer.beginning_of_buffer
+    @buffer.forward_line(3)
+    @window.top_of_window.location = @buffer.point
 
-    # Commands.scroll_downが呼ばれることを確認するため、モックを用意
-    scroll_down_called = false
-    original_scroll_down = Commands.method(:scroll_down) rescue nil
-
-    Commands.define_singleton_method(:scroll_down) do
-      scroll_down_called = true
-    end
-
+    Curses.push_mouse_event(bstate: Curses::BUTTON4_PRESSED, x: 0, y: 0)
     @window.send(:handle_mouse_event)
 
-    assert(scroll_down_called, "Commands.scroll_down should be called")
-
-    # 後片付け
-    if original_scroll_down
-      Commands.define_singleton_method(:scroll_down, original_scroll_down)
-    end
+    assert_equal(0, @window.top_of_window.location)
   end
 
-  def test_handle_mouse_scroll_down
-    # スクロール下（内容を上に）イベント
-    Curses.push_mouse_event(
-      bstate: Curses::BUTTON5_PRESSED,
-      x: 0,
-      y: 0
-    )
+  def test_handle_mouse_scroll_down_moves_top_of_window_down_by_default_lines
+    @buffer.insert("Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7")
+    @buffer.beginning_of_buffer
 
-    # Commands.scroll_upが呼ばれることを確認
-    scroll_up_called = false
-    original_scroll_up = Commands.method(:scroll_up) rescue nil
-
-    Commands.define_singleton_method(:scroll_up) do
-      scroll_up_called = true
-    end
-
+    Curses.push_mouse_event(bstate: Curses::BUTTON5_PRESSED, x: 0, y: 0)
     @window.send(:handle_mouse_event)
 
-    assert(scroll_up_called, "Commands.scroll_up should be called")
+    @buffer.beginning_of_buffer
+    @buffer.forward_line(CONFIG[:mouse_wheel_scroll_lines])
+    assert_equal(@buffer.point, @window.top_of_window.location)
+  end
 
-    # 後片付け
-    if original_scroll_up
-      Commands.define_singleton_method(:scroll_up, original_scroll_up)
+  def test_handle_mouse_scroll_down_drags_point_when_hidden_above_new_top
+    # pointがバッファ先頭のまま下スクロールすると、新しいtop_of_windowより
+    # 前(画面外)に隠れてしまうため、Emacs風にpointが追従するはず
+    @buffer.insert("Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7")
+    @buffer.beginning_of_buffer
+
+    Curses.push_mouse_event(bstate: Curses::BUTTON5_PRESSED, x: 0, y: 0)
+    @window.send(:handle_mouse_event)
+
+    assert_equal(@window.top_of_window.location, @buffer.point)
+  end
+
+  def test_handle_mouse_scroll_up_is_safe_noop_at_buffer_top
+    @buffer.insert("Line 1\nLine 2\nLine 3")
+    @buffer.beginning_of_buffer
+
+    Curses.push_mouse_event(bstate: Curses::BUTTON4_PRESSED, x: 0, y: 0)
+    assert_nothing_raised do
+      @window.send(:handle_mouse_event)
+    end
+    assert_equal(0, @window.top_of_window.location)
+  end
+
+  def test_handle_mouse_scroll_down_is_safe_at_buffer_bottom
+    @buffer.insert("Line 1\nLine 2")
+    @buffer.beginning_of_buffer
+
+    Curses.push_mouse_event(bstate: Curses::BUTTON5_PRESSED, x: 0, y: 0)
+    assert_nothing_raised do
+      @window.send(:handle_mouse_event)
+    end
+    # 2行しかないバッファなので、規定の3行分は進めずバッファ末尾までしか進まない
+    assert(@window.top_of_window.location <= @buffer.bytesize)
+  end
+
+  def test_handle_mouse_scroll_falls_back_to_page_scroll_when_config_disabled
+    original = CONFIG[:mouse_wheel_scroll_lines]
+    CONFIG[:mouse_wheel_scroll_lines] = 0
+    begin
+      @buffer.insert("Line 1\nLine 2\nLine 3")
+      @buffer.beginning_of_buffer
+
+      Curses.push_mouse_event(bstate: Curses::BUTTON4_PRESSED, x: 0, y: 0)
+
+      scroll_down_called = false
+      original_scroll_down = Commands.method(:scroll_down)
+      Commands.define_singleton_method(:scroll_down) { scroll_down_called = true }
+
+      @window.send(:handle_mouse_event)
+
+      assert(scroll_down_called, "Commands.scroll_down should be called when CONFIG[:mouse_wheel_scroll_lines] is 0")
+
+      Commands.define_singleton_method(:scroll_down, original_scroll_down)
+    ensure
+      CONFIG[:mouse_wheel_scroll_lines] = original
     end
   end
 
